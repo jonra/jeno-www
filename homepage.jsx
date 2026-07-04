@@ -753,35 +753,6 @@ function CheckGlyphLight() {
   );
 }
 function ClosingCTA({ mobile }) {
-  const [submitted, setSubmitted] = React.useState(false);
-  const [submitting, setSubmitting] = React.useState(false);
-  const [errored, setErrored] = React.useState(false);
-  const [name, setName] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [company, setCompany] = React.useState("");
-  const [honeypot, setHoneypot] = React.useState("");
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrored(false);
-    setSubmitting(true);
-    try {
-      await submitInterest({
-        name,
-        email,
-        company,
-        message: "Early access request",
-        sourcePage: "www:get-early-access",
-        website: honeypot,
-      });
-      setSubmitted(true);
-    } catch (err) {
-      setErrored(true);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   return (
     <Section id="trial" peach mobile={mobile} pad="wide">
       <div style={{
@@ -810,117 +781,16 @@ function ClosingCTA({ mobile }) {
         }}>
           Run a real project through the Jeno Platform today.
         </p>
-        {submitted ? (
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            background: "rgba(0, 200, 150, 0.12)",
-            border: "1px solid var(--mint)",
-            borderRadius: 8,
-            padding: "16px 22px",
-            maxWidth: 540,
-          }}>
-            <CheckGlyphLight />
-            <span style={{ fontSize: mobile ? 14.5 : 16, color: "var(--aubergine)", fontWeight: 500, textWrap: "pretty" }}>
-              You're in. We'll be in touch shortly to set up your access.
-            </span>
-          </div>
-        ) : (
-          <form
-            onSubmit={handleSubmit}
-            style={{
-              display: "flex",
-              flexDirection: mobile ? "column" : "row",
-              gap: 8,
-              alignItems: mobile ? "stretch" : "center",
-              background: "#fff",
-              border: "1px solid var(--n-200)",
-              borderRadius: 8,
-              padding: 6,
-              width: mobile ? "100%" : "auto",
-              maxWidth: 640,
-            }}
-          >
-            {/* Honeypot - hidden from real users, bots tend to fill every input */}
-            <input
-              type="text"
-              name="website"
-              value={honeypot}
-              onChange={(e) => setHoneypot(e.target.value)}
-              tabIndex={-1}
-              autoComplete="off"
-              style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
-              aria-hidden="true"
-            />
-            <input
-              type="text"
-              required
-              placeholder="Full name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              style={{
-                border: mobile ? "1px solid var(--n-200)" : "none",
-                borderRadius: mobile ? 6 : 0,
-                outline: "none",
-                fontFamily: "var(--font-sans)",
-                fontSize: 14,
-                color: "var(--aubergine)",
-                background: "transparent",
-                padding: mobile ? "10px 12px" : "10px 12px",
-                width: mobile ? "100%" : 160,
-              }}
-            />
-            <input
-              type="email"
-              required
-              placeholder="Work email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{
-                border: mobile ? "1px solid var(--n-200)" : "none",
-                borderRadius: mobile ? 6 : 0,
-                outline: "none",
-                fontFamily: "var(--font-sans)",
-                fontSize: 14,
-                color: "var(--aubergine)",
-                background: "transparent",
-                padding: mobile ? "10px 12px" : "10px 12px",
-                width: mobile ? "100%" : 200,
-              }}
-            />
-            <input
-              type="text"
-              placeholder="Company (optional)"
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-              style={{
-                border: mobile ? "1px solid var(--n-200)" : "none",
-                borderRadius: mobile ? 6 : 0,
-                outline: "none",
-                fontFamily: "var(--font-sans)",
-                fontSize: 14,
-                color: "var(--aubergine)",
-                background: "transparent",
-                padding: mobile ? "10px 12px" : "10px 12px",
-                width: mobile ? "100%" : 160,
-              }}
-            />
-            <button
-              type="submit"
-              disabled={submitting}
-              className="btn btn-mint"
-              style={{ padding: "12px 20px", fontSize: 14, fontFamily: "var(--font-sans)", width: mobile ? "100%" : "auto" }}
-            >
-              {submitting ? "Sending…" : <React.Fragment>Get Free Early Access <ArrowRight /></React.Fragment>}
-            </button>
-          </form>
-        )}
-        {errored && !submitted && (
-          <span style={{ fontSize: 13, color: "var(--n-700)" }}>
-            Something went wrong — please try again in a moment.
-          </span>
-        )}
+        <a
+          href="https://jeno-energy-e92646de1825.herokuapp.com/signup"
+          className="btn btn-mint"
+          style={{
+            padding: "14px 24px", fontSize: 14, fontFamily: "var(--font-sans)",
+            display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none",
+          }}
+        >
+          Get Free Early Access <ArrowRight />
+        </a>
       </div>
     </Section>
   );
