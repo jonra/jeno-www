@@ -1,5 +1,16 @@
 /* global React */
 
+const INTEREST_ENDPOINT = "https://jeno-energy-e92646de1825.herokuapp.com/api/public/interest";
+
+async function submitInterest(fields) {
+  const res = await fetch(INTEREST_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ website: "", ...fields }),
+  });
+  if (!res.ok) throw new Error("submit failed: " + res.status);
+}
+
 function jenoAsset(path) {
   // When bundled standalone, resources are lifted into window.__resources.
   const map = (typeof window !== "undefined" && window.__resources) || {};
@@ -743,6 +754,34 @@ function CheckGlyphLight() {
 }
 function ClosingCTA({ mobile }) {
   const [submitted, setSubmitted] = React.useState(false);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [errored, setErrored] = React.useState(false);
+  const [name, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [company, setCompany] = React.useState("");
+  const [honeypot, setHoneypot] = React.useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrored(false);
+    setSubmitting(true);
+    try {
+      await submitInterest({
+        name,
+        email,
+        company,
+        message: "Early access request",
+        sourcePage: "www:get-early-access",
+        website: honeypot,
+      });
+      setSubmitted(true);
+    } catch (err) {
+      setErrored(true);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <Section id="trial" peach mobile={mobile} pad="wide">
       <div style={{
@@ -784,18 +823,103 @@ function ClosingCTA({ mobile }) {
           }}>
             <CheckGlyphLight />
             <span style={{ fontSize: mobile ? 14.5 : 16, color: "var(--aubergine)", fontWeight: 500, textWrap: "pretty" }}>
-              You're in. We'll send your login link shortly, keep an eye on your inbox.
+              You're in. We'll be in touch shortly to set up your access.
             </span>
           </div>
         ) : (
-          <button
-            type="button"
-            className="btn btn-mint"
-            style={{ padding: "14px 24px", fontSize: 14, fontFamily: "var(--font-sans)" }}
-            onClick={() => setSubmitted(true)}
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              display: "flex",
+              flexDirection: mobile ? "column" : "row",
+              gap: 8,
+              alignItems: mobile ? "stretch" : "center",
+              background: "#fff",
+              border: "1px solid var(--n-200)",
+              borderRadius: 8,
+              padding: 6,
+              width: mobile ? "100%" : "auto",
+              maxWidth: 640,
+            }}
           >
-            Get Free Early Access <ArrowRight />
-          </button>
+            {/* Honeypot - hidden from real users, bots tend to fill every input */}
+            <input
+              type="text"
+              name="website"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+              style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+              aria-hidden="true"
+            />
+            <input
+              type="text"
+              required
+              placeholder="Full name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              style={{
+                border: mobile ? "1px solid var(--n-200)" : "none",
+                borderRadius: mobile ? 6 : 0,
+                outline: "none",
+                fontFamily: "var(--font-sans)",
+                fontSize: 14,
+                color: "var(--aubergine)",
+                background: "transparent",
+                padding: mobile ? "10px 12px" : "10px 12px",
+                width: mobile ? "100%" : 160,
+              }}
+            />
+            <input
+              type="email"
+              required
+              placeholder="Work email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{
+                border: mobile ? "1px solid var(--n-200)" : "none",
+                borderRadius: mobile ? 6 : 0,
+                outline: "none",
+                fontFamily: "var(--font-sans)",
+                fontSize: 14,
+                color: "var(--aubergine)",
+                background: "transparent",
+                padding: mobile ? "10px 12px" : "10px 12px",
+                width: mobile ? "100%" : 200,
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Company (optional)"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              style={{
+                border: mobile ? "1px solid var(--n-200)" : "none",
+                borderRadius: mobile ? 6 : 0,
+                outline: "none",
+                fontFamily: "var(--font-sans)",
+                fontSize: 14,
+                color: "var(--aubergine)",
+                background: "transparent",
+                padding: mobile ? "10px 12px" : "10px 12px",
+                width: mobile ? "100%" : 160,
+              }}
+            />
+            <button
+              type="submit"
+              disabled={submitting}
+              className="btn btn-mint"
+              style={{ padding: "12px 20px", fontSize: 14, fontFamily: "var(--font-sans)", width: mobile ? "100%" : "auto" }}
+            >
+              {submitting ? "Sending…" : <React.Fragment>Get Free Early Access <ArrowRight /></React.Fragment>}
+            </button>
+          </form>
+        )}
+        {errored && !submitted && (
+          <span style={{ fontSize: 13, color: "var(--n-700)" }}>
+            Something went wrong — please try again in a moment.
+          </span>
         )}
       </div>
     </Section>
@@ -804,6 +928,30 @@ function ClosingCTA({ mobile }) {
 
 // ----- UPDATES CATCH -----
 function UpdatesSection({ mobile }) {
+  const [email, setEmail] = React.useState("");
+  const [done, setDone] = React.useState(false);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [errored, setErrored] = React.useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrored(false);
+    setSubmitting(true);
+    try {
+      await submitInterest({
+        name: "Updates subscriber",
+        email,
+        message: "Signed up for email updates",
+        sourcePage: "www:updates",
+      });
+      setDone(true);
+    } catch (err) {
+      setErrored(true);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <Section mobile={mobile} light pad="tight">
       <div style={{
@@ -819,43 +967,57 @@ function UpdatesSection({ mobile }) {
             capabilities and what we are learning from C&amp;I projects in the field.
           </p>
         </div>
-        <form style={{
-          display: "flex",
-          gap: 8,
-          alignItems: "center",
-          background: "#fff",
-          border: "1px solid var(--n-200)",
-          borderRadius: 8,
-          padding: 6,
-          flexDirection: mobile ? "column" : "row",
-        }} onSubmit={(e) => e.preventDefault()}>
-          <label style={{ flex: 1, width: mobile ? "100%" : "auto", display: "flex", flexDirection: "column", gap: 2, padding: "6px 10px" }}>
-            <span className="mono" style={{ fontSize: 10, color: "var(--n-500)", letterSpacing: 0.6, textTransform: "uppercase" }}>
-              Work email
-            </span>
-            <input
-              type="email"
-              placeholder="name@company.com"
-              style={{
-                border: "none",
-                outline: "none",
-                fontFamily: "var(--font-sans)",
-                fontSize: 14,
-                color: "var(--aubergine)",
-                background: "transparent",
-                padding: 0,
-                width: "100%",
-              }}
-            />
-          </label>
-          <button className="btn btn-outline-aub" style={{
-            padding: "10px 16px",
-            fontSize: 13,
-            width: mobile ? "100%" : "auto",
-          }}>
-            Sign up for updates
-          </button>
-        </form>
+        {done ? (
+          <p style={{ fontSize: mobile ? 14.5 : 16, color: "var(--aubergine)", fontWeight: 500 }}>
+            Thanks — you're on the list.
+          </p>
+        ) : (
+          <form style={{
+            display: "flex",
+            gap: 8,
+            alignItems: "center",
+            background: "#fff",
+            border: "1px solid var(--n-200)",
+            borderRadius: 8,
+            padding: 6,
+            flexDirection: mobile ? "column" : "row",
+          }} onSubmit={handleSubmit}>
+            <label style={{ flex: 1, width: mobile ? "100%" : "auto", display: "flex", flexDirection: "column", gap: 2, padding: "6px 10px" }}>
+              <span className="mono" style={{ fontSize: 10, color: "var(--n-500)", letterSpacing: 0.6, textTransform: "uppercase" }}>
+                Work email
+              </span>
+              <input
+                type="email"
+                required
+                placeholder="name@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                style={{
+                  border: "none",
+                  outline: "none",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: 14,
+                  color: "var(--aubergine)",
+                  background: "transparent",
+                  padding: 0,
+                  width: "100%",
+                }}
+              />
+            </label>
+            <button type="submit" disabled={submitting} className="btn btn-outline-aub" style={{
+              padding: "10px 16px",
+              fontSize: 13,
+              width: mobile ? "100%" : "auto",
+            }}>
+              {submitting ? "Sending…" : "Sign up for updates"}
+            </button>
+          </form>
+        )}
+        {errored && !done && (
+          <span style={{ fontSize: 13, color: "var(--n-700)" }}>
+            Something went wrong — please try again in a moment.
+          </span>
+        )}
       </div>
     </Section>
   );
