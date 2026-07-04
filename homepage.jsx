@@ -1054,7 +1054,7 @@ function Footer({ mobile }) {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingTop: 6 }}>
           <div style={{ display: "flex", flexDirection: mobile ? "column" : "row", flexWrap: "wrap", gap: mobile ? 10 : 22, fontSize: 14 }}>
-            <a style={footLink}>Privacy Policy</a>
+            <a href="https://jeno-energy-e92646de1825.herokuapp.com/privacy" style={footLink}>Privacy Policy</a>
             <a style={footLink}>Terms of Service</a>
             <a style={footLink}>Careers</a>
             <a style={footLink}>Contact</a>
