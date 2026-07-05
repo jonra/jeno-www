@@ -186,10 +186,16 @@ function Hero({ mobile }) {
 
         {/* Visuals column */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <window.ScreenshotFrame
-            src="assets/images/projects-screen.png"
-            alt="Jeno project portfolio, five commercial solar projects with PV, inverter, and battery sizing"
-            breadcrumb="jeno / solar-projects"
+          <img
+            src="assets/images/hero-staggered.png"
+            alt="Jeno solar project dashboard over a commercial rooftop solar installation"
+            style={{
+              display: "block",
+              width: "100%",
+              height: "auto",
+              borderRadius: 12,
+              boxShadow: "0 24px 50px -22px rgba(0, 0, 0, 0.35)",
+            }}
           />
         </div>
       </div>
