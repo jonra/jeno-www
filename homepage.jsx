@@ -759,7 +759,6 @@ function ClosingCTA({ mobile }) {
   const [role, setRole] = React.useState("");
   const [country, setCountry] = React.useState("");
   const [email, setEmail] = React.useState("");
-  const [honeypot, setHoneypot] = React.useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -774,9 +773,6 @@ function ClosingCTA({ mobile }) {
       country: (formData.get("country") || "").toString().trim(),
       email: (formData.get("email") || "").toString().trim(),
     };
-    // honeypot has no `name` attribute (see Fix 1), so it can't be read via
-    // FormData - keep reading it from React state, which is fine since it's
-    // never meant to be user-visible/autofilled in the first place.
 
     if (!values.firstName || !values.lastName || !values.company || !values.role || !values.country || !values.email) {
       setErrorMessage(REQUIRED_FIELDS_MESSAGE);
@@ -789,7 +785,7 @@ function ClosingCTA({ mobile }) {
       const res = await fetch("https://jeno-energy-e92646de1825.herokuapp.com/api/public/early-access-signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, website: honeypot }),
+        body: JSON.stringify(values),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => null);
@@ -905,10 +901,6 @@ function ClosingCTA({ mobile }) {
               <input type="email" name="email" autoComplete="email" required placeholder="Email" value={email}
                 onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
             </label>
-            <input type="text" value={honeypot} onChange={(e) => setHoneypot(e.target.value)}
-              tabIndex={-1} autoComplete="off" aria-hidden="true"
-              style={{ position: "absolute", left: "-9999px", width: 1, height: 1 }} />
-
             {errored && (
               <p style={{ gridColumn: "1 / -1", color: "#b91c1c", fontSize: 13, margin: 0 }}>
                 {errorMessage}
