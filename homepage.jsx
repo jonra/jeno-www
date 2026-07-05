@@ -193,8 +193,7 @@ function Hero({ mobile }) {
               display: "block",
               width: "100%",
               height: "auto",
-              borderRadius: 12,
-              boxShadow: "0 24px 50px -22px rgba(0, 0, 0, 0.35)",
+              filter: "drop-shadow(0 24px 50px rgba(0, 0, 0, 0.35))",
             }}
           />
         </div>
