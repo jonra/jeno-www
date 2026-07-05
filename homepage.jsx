@@ -757,10 +757,13 @@ const COUNTRIES = [
   "Kenya", "Tanzania", "Nigeria", "Ghana", "Other",
 ];
 
+const REQUIRED_FIELDS_MESSAGE = "Please fill in every field with a valid email, then try again.";
+
 function ClosingCTA({ mobile }) {
   const [submitted, setSubmitted] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [errored, setErrored] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState(REQUIRED_FIELDS_MESSAGE);
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [company, setCompany] = React.useState("");
@@ -773,6 +776,7 @@ function ClosingCTA({ mobile }) {
     e.preventDefault();
     if (submitting) return;
     if (!firstName.trim() || !lastName.trim() || !company.trim() || !role.trim() || !country || !email.trim()) {
+      setErrorMessage(REQUIRED_FIELDS_MESSAGE);
       setErrored(true);
       return;
     }
@@ -784,9 +788,15 @@ function ClosingCTA({ mobile }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ firstName, lastName, company, role, country, email, website: honeypot }),
       });
-      if (!res.ok) throw new Error("signup failed: " + res.status);
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        const err = new Error(body?.error || ("signup failed: " + res.status));
+        err.serverMessage = body?.error;
+        throw err;
+      }
       setSubmitted(true);
     } catch (err) {
+      setErrorMessage(err.serverMessage || "Something went wrong. Please try again.");
       setErrored(true);
     } finally {
       setSubmitting(false);
@@ -800,6 +810,19 @@ function ClosingCTA({ mobile }) {
     border: "1px solid var(--n-200)",
     borderRadius: 6,
     width: "100%",
+  };
+
+  const labelStyle = {
+    display: "flex",
+    flexDirection: "column",
+    gap: 4,
+  };
+
+  const labelTextStyle = {
+    fontSize: 10,
+    color: "var(--n-500)",
+    letterSpacing: 0.6,
+    textTransform: "uppercase",
   };
 
   return (
@@ -847,29 +870,45 @@ function ClosingCTA({ mobile }) {
             maxWidth: 520,
             textAlign: "left",
           }}>
-            <input type="text" required placeholder="First name" value={firstName}
-              onChange={(e) => setFirstName(e.target.value)} style={inputStyle} />
-            <input type="text" required placeholder="Last name" value={lastName}
-              onChange={(e) => setLastName(e.target.value)} style={inputStyle} />
-            <input type="text" required placeholder="Company" value={company}
-              onChange={(e) => setCompany(e.target.value)}
-              style={{ ...inputStyle, gridColumn: mobile ? "auto" : "1 / -1" }} />
-            <input type="text" required placeholder="Role" value={role}
-              onChange={(e) => setRole(e.target.value)} style={inputStyle} />
-            <select required value={country} onChange={(e) => setCountry(e.target.value)} style={inputStyle}>
-              <option value="" disabled>Country</option>
-              {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <input type="email" required placeholder="Email" value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{ ...inputStyle, gridColumn: mobile ? "auto" : "1 / -1" }} />
-            <input type="text" value={honeypot} onChange={(e) => setHoneypot(e.target.value)}
+            <label style={labelStyle}>
+              <span className="mono" style={labelTextStyle}>First name</span>
+              <input type="text" name="firstName" autoComplete="given-name" required placeholder="First name" value={firstName}
+                onChange={(e) => setFirstName(e.target.value)} style={inputStyle} />
+            </label>
+            <label style={labelStyle}>
+              <span className="mono" style={labelTextStyle}>Last name</span>
+              <input type="text" name="lastName" autoComplete="family-name" required placeholder="Last name" value={lastName}
+                onChange={(e) => setLastName(e.target.value)} style={inputStyle} />
+            </label>
+            <label style={{ ...labelStyle, gridColumn: mobile ? "auto" : "1 / -1" }}>
+              <span className="mono" style={labelTextStyle}>Company</span>
+              <input type="text" name="company" autoComplete="organization" required placeholder="Company" value={company}
+                onChange={(e) => setCompany(e.target.value)} style={inputStyle} />
+            </label>
+            <label style={labelStyle}>
+              <span className="mono" style={labelTextStyle}>Role</span>
+              <input type="text" name="role" autoComplete="organization-title" required placeholder="Role" value={role}
+                onChange={(e) => setRole(e.target.value)} style={inputStyle} />
+            </label>
+            <label style={labelStyle}>
+              <span className="mono" style={labelTextStyle}>Country</span>
+              <select name="country" autoComplete="country-name" required value={country} onChange={(e) => setCountry(e.target.value)} style={inputStyle}>
+                <option value="" disabled>Country</option>
+                {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </label>
+            <label style={{ ...labelStyle, gridColumn: mobile ? "auto" : "1 / -1" }}>
+              <span className="mono" style={labelTextStyle}>Email</span>
+              <input type="email" name="email" autoComplete="email" required placeholder="Email" value={email}
+                onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
+            </label>
+            <input type="text" name="website" value={honeypot} onChange={(e) => setHoneypot(e.target.value)}
               tabIndex={-1} autoComplete="off"
               style={{ position: "absolute", left: "-9999px", width: 1, height: 1 }} />
 
             {errored && (
               <p style={{ gridColumn: "1 / -1", color: "#b91c1c", fontSize: 13, margin: 0 }}>
-                Please fill in every field with a valid email, then try again.
+                {errorMessage}
               </p>
             )}
 
