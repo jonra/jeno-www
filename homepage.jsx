@@ -90,7 +90,7 @@ function Nav({ mobile }) {
           fontWeight: 500,
           fontFamily: "var(--font-sans)",
           whiteSpace: "nowrap",
-        }}>Get Early Access</button>
+        }} onClick={() => document.getElementById('trial')?.scrollIntoView({ behavior: 'smooth' })}>Get Early Access</button>
       </nav>
     );
   }
@@ -189,7 +189,7 @@ function Hero({ mobile }) {
             commercial energy objectives.
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <a className="btn btn-mint" style={{ padding: "12px 18px", fontSize: 14 }}>
+            <a href="#trial" className="btn btn-mint" style={{ padding: "12px 18px", fontSize: 14 }}>
               Get Free Early Access <ArrowRight />
             </a>
           </div>
