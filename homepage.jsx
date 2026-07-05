@@ -746,11 +746,6 @@ function CheckGlyphLight() {
     </svg>
   );
 }
-const COUNTRIES = [
-  "Botswana", "South Africa", "Namibia", "Zambia", "Zimbabwe", "Mozambique",
-  "Kenya", "Tanzania", "Nigeria", "Ghana", "Other",
-];
-
 const REQUIRED_FIELDS_MESSAGE = "Please fill in every field with a valid email, then try again.";
 
 function ClosingCTA({ mobile }) {
@@ -762,7 +757,6 @@ function ClosingCTA({ mobile }) {
   const [lastName, setLastName] = React.useState("");
   const [company, setCompany] = React.useState("");
   const [role, setRole] = React.useState("");
-  const [country, setCountry] = React.useState("");
   const [email, setEmail] = React.useState("");
 
   async function handleSubmit(e) {
@@ -775,11 +769,10 @@ function ClosingCTA({ mobile }) {
       lastName: (formData.get("lastName") || "").toString().trim(),
       company: (formData.get("company") || "").toString().trim(),
       role: (formData.get("role") || "").toString().trim(),
-      country: (formData.get("country") || "").toString().trim(),
       email: (formData.get("email") || "").toString().trim(),
     };
 
-    if (!values.firstName || !values.lastName || !values.company || !values.role || !values.country || !values.email) {
+    if (!values.firstName || !values.lastName || !values.company || !values.role || !values.email) {
       setErrorMessage(REQUIRED_FIELDS_MESSAGE);
       setErrored(true);
       return;
@@ -889,17 +882,10 @@ function ClosingCTA({ mobile }) {
               <input type="text" name="company" autoComplete="organization" required placeholder="Company" value={company}
                 onChange={(e) => setCompany(e.target.value)} style={inputStyle} />
             </label>
-            <label style={labelStyle}>
+            <label style={{ ...labelStyle, gridColumn: mobile ? "auto" : "1 / -1" }}>
               <span className="mono" style={labelTextStyle}>Role</span>
               <input type="text" name="role" autoComplete="organization-title" required placeholder="Role" value={role}
                 onChange={(e) => setRole(e.target.value)} style={inputStyle} />
-            </label>
-            <label style={labelStyle}>
-              <span className="mono" style={labelTextStyle}>Country</span>
-              <select name="country" autoComplete="country-name" required value={country} onChange={(e) => setCountry(e.target.value)} style={inputStyle}>
-                <option value="" disabled>Country</option>
-                {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
             </label>
             <label style={{ ...labelStyle, gridColumn: mobile ? "auto" : "1 / -1" }}>
               <span className="mono" style={labelTextStyle}>Email</span>
