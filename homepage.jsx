@@ -752,7 +752,56 @@ function CheckGlyphLight() {
     </svg>
   );
 }
+const COUNTRIES = [
+  "Botswana", "South Africa", "Namibia", "Zambia", "Zimbabwe", "Mozambique",
+  "Kenya", "Tanzania", "Nigeria", "Ghana", "Other",
+];
+
 function ClosingCTA({ mobile }) {
+  const [submitted, setSubmitted] = React.useState(false);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [errored, setErrored] = React.useState(false);
+  const [firstName, setFirstName] = React.useState("");
+  const [lastName, setLastName] = React.useState("");
+  const [company, setCompany] = React.useState("");
+  const [role, setRole] = React.useState("");
+  const [country, setCountry] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [honeypot, setHoneypot] = React.useState("");
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (submitting) return;
+    if (!firstName.trim() || !lastName.trim() || !company.trim() || !role.trim() || !country || !email.trim()) {
+      setErrored(true);
+      return;
+    }
+    setErrored(false);
+    setSubmitting(true);
+    try {
+      const res = await fetch("https://jeno-energy-e92646de1825.herokuapp.com/api/public/early-access-signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ firstName, lastName, company, role, country, email, website: honeypot }),
+      });
+      if (!res.ok) throw new Error("signup failed: " + res.status);
+      setSubmitted(true);
+    } catch (err) {
+      setErrored(true);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  const inputStyle = {
+    padding: "10px 14px",
+    fontSize: 14,
+    fontFamily: "var(--font-sans)",
+    border: "1px solid var(--n-200)",
+    borderRadius: 6,
+    width: "100%",
+  };
+
   return (
     <Section id="trial" peach mobile={mobile} pad="wide">
       <div style={{
@@ -781,16 +830,58 @@ function ClosingCTA({ mobile }) {
         }}>
           Run a real project through the Jeno Platform today.
         </p>
-        <a
-          href="https://jeno-energy-e92646de1825.herokuapp.com/signup"
-          className="btn btn-mint"
-          style={{
-            padding: "14px 24px", fontSize: 14, fontFamily: "var(--font-sans)",
-            display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none",
-          }}
-        >
-          Get Free Early Access <ArrowRight />
-        </a>
+
+        {submitted ? (
+          <div style={{
+            background: "#fff", borderRadius: 10, padding: "20px 28px",
+            maxWidth: 480, fontSize: 15, color: "var(--aubergine)", lineHeight: 1.5,
+          }}>
+            You're in. We'll email you a link to set your password and finish signing in.
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} style={{
+            display: "grid",
+            gridTemplateColumns: mobile ? "1fr" : "1fr 1fr",
+            gap: 12,
+            width: "100%",
+            maxWidth: 520,
+            textAlign: "left",
+          }}>
+            <input type="text" required placeholder="First name" value={firstName}
+              onChange={(e) => setFirstName(e.target.value)} style={inputStyle} />
+            <input type="text" required placeholder="Last name" value={lastName}
+              onChange={(e) => setLastName(e.target.value)} style={inputStyle} />
+            <input type="text" required placeholder="Company" value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              style={{ ...inputStyle, gridColumn: mobile ? "auto" : "1 / -1" }} />
+            <input type="text" required placeholder="Role" value={role}
+              onChange={(e) => setRole(e.target.value)} style={inputStyle} />
+            <select required value={country} onChange={(e) => setCountry(e.target.value)} style={inputStyle}>
+              <option value="" disabled>Country</option>
+              {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <input type="email" required placeholder="Email" value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{ ...inputStyle, gridColumn: mobile ? "auto" : "1 / -1" }} />
+            <input type="text" value={honeypot} onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1} autoComplete="off"
+              style={{ position: "absolute", left: "-9999px", width: 1, height: 1 }} />
+
+            {errored && (
+              <p style={{ gridColumn: "1 / -1", color: "#b91c1c", fontSize: 13, margin: 0 }}>
+                Please fill in every field with a valid email, then try again.
+              </p>
+            )}
+
+            <button type="submit" disabled={submitting} className="btn btn-mint" style={{
+              gridColumn: "1 / -1", padding: "14px 24px", fontSize: 14, fontFamily: "var(--font-sans)",
+              display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6,
+              opacity: submitting ? 0.7 : 1, cursor: submitting ? "default" : "pointer",
+            }}>
+              {submitting ? "Submitting..." : (<>Get Free Early Access <ArrowRight /></>)}
+            </button>
+          </form>
+        )}
       </div>
     </Section>
   );
