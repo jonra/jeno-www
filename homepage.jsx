@@ -154,7 +154,7 @@ function Hero({ mobile }) {
       }}>
         <div style={{ display: "flex", flexDirection: "column", gap: mobile ? 20 : 28 }}>
           <Eyebrow mobile={mobile} color="var(--mint)" style={{ lineHeight: 1.4 }}>
-            The AI-Powered Solar Structuring Engine for bankable C&amp;I projects
+            The AI-Powered Solar System Sizing Engine
           </Eyebrow>
           <h1 style={{
             fontSize: mobile ? 36 : 60,
@@ -931,7 +931,7 @@ function Footer({ mobile }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <Logo src="assets/logo_primary_wordmark.png" height={38} />
           <p style={{ fontSize: 13, color: "var(--n-600)", lineHeight: 1.5, maxWidth: 280 }}>
-            Jeno Energy. The AI-Powered Solar Structuring Engine for bankable C&amp;I projects.
+            Jeno Energy. The AI-Powered Solar System Sizing Engine.
           </p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingTop: 6 }}>
