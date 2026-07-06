@@ -52,6 +52,17 @@
           mq.removeEventListener ? mq.removeEventListener("change", onChange) : mq.removeListener(onChange);
         };
       }, [mq]);
+      React.useEffect(() => {
+        fetch("https://jeno-energy-e92646de1825.herokuapp.com/api/public/pageview", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            path: window.location.pathname || "/",
+            referrer: document.referrer || "",
+          }),
+          keepalive: true,
+        }).catch(() => {});
+      }, []);
       return <Homepage mobile={mobile} />;
     }
 
